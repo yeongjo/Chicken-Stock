@@ -1,9 +1,3 @@
-﻿---
-title: "FFT(Fast Fourier Transform) 알고리즘"
-date: "2020-05-10"
-author: "Jongwon"
----
-
 
 
 #### FFT(Fast Fourier Transform) 알고리즘                                                   201601726_이종원
@@ -30,7 +24,7 @@ FFT는 이산푸리에변환 DFT(Discrete Fourier Transform)와 그 역변환을
 
 그런데,  수열 C를 IDFT로 변환시키면 수열c가 나오게 됩니다.
 
-<img src="dft 변환그림.PNG" alt="dft 변환그림" style="zoom:67%;" />
+<img src="https://user-images.githubusercontent.com/62750326/82152795-afce2980-989e-11ea-914e-31022bea6162.PNG" alt="dft 변환그림" style="zoom:67%;" />
 
 
 
@@ -40,7 +34,7 @@ a,b의 합성곱과 A,B의 단순곱이 서로 대응되는 관계에 있다는 
 
 convolution은  크기가 n인 배열 a,b가 있다고 했을때, 아래와 같은 식으로 계산된 c입니다.
 
-<img src="c.PNG" alt="c" style="zoom:80%;" />
+<img src="https://user-images.githubusercontent.com/62750326/82152808-cc6a6180-989e-11ea-8fad-2996d9ffa644.PNG" alt="c" style="zoom:80%;" />
 
 convolution으로 C를 계산할때 시간복잡도는 n^2이지만, FFT를 사용하여 계산할시 시간복잡도는 NlogN 입니다.
 
@@ -50,7 +44,7 @@ convolution으로 C를 계산할때 시간복잡도는 n^2이지만, FFT를 사�
 
 
 
-![DFT](DFT.PNG)              ![IDFT](IDFT.PNG)
+![DFT](https://user-images.githubusercontent.com/62750326/82152819-df7d3180-989e-11ea-9033-a897fac8dd2a.PNG)              ![IDFT](https://user-images.githubusercontent.com/62750326/82152844-ffacf080-989e-11ea-8438-3919ee724110.PNG)
 
 ​                       (DFT)                                                                    (IDFT)
 
@@ -58,9 +52,9 @@ convolution으로 C를 계산할때 시간복잡도는 n^2이지만, FFT를 사�
 
 * 위의 식들은 주기가 N인 수열의 DFT와 IDFT계산시 사용하는 식입니다.
 
-* 오일러 공식  <img src="오일러 공식.PNG" alt="오일러 공식" style="zoom:67%;" />을 생각해보면 이 수열들이 sin, cos 주기함수들의 합으로 표현된 것을 알 수 있습니다.
+* 오일러 공식  <img src="https://user-images.githubusercontent.com/62750326/82152865-223f0980-989f-11ea-93c4-7770e71f05af.PNG" alt="오일러 공식" style="zoom:67%;" />을 생각해보면 이 수열들이 sin, cos 주기함수들의 합으로 표현된 것을 알 수 있습니다.
 
-<img src="짝수 홀수 분리.PNG" alt="짝수 홀수 분리" style="zoom:67%;" /> 
+<img src="https://user-images.githubusercontent.com/62750326/82152875-3551d980-989f-11ea-84ee-aff723b3a40f.PNG" alt="짝수 홀수 분리" style="zoom:67%;" /> 
 
 * 위의 식은 DFT식을 변환시킨 것인데, 각각 짝수번째 항의 DFT와 홀수번째 항의 DFT로 분리시켜 놓은 것 입니다. (FFT 계산에 활용)
 
@@ -72,7 +66,7 @@ convolution으로 C를 계산할때 시간복잡도는 n^2이지만, FFT를 사�
 
 
 
-![image-20200517232701362](image-20200517232701362.png)
+![image-20200517232701362](https://user-images.githubusercontent.com/62750326/82152907-59151f80-989f-11ea-8d2d-f96724d1b8b3.PNG)
 
 * 개념만 봐서는 잘 이해가 되지 않아서 예제 문제를 찾아서 어떻게 활용할지 생각해 보았습니다.
 
@@ -88,7 +82,7 @@ convolution으로 C를 계산할때 시간복잡도는 n^2이지만, FFT를 사�
 
 
 
-<img src="복소수 연산횟수.PNG" alt="복소수 연산횟수" style="zoom:67%;" />
+<img src="https://user-images.githubusercontent.com/62750326/82152922-6b8f5900-989f-11ea-92c6-9837603072f2.PNG" alt="복소수 연산횟수" style="zoom:67%;" />
 
 **(위의 표는 DFT와 FFT 연산시 필요한 복소수의 연산 횟수를 나타낸 표입니다.)**
 
@@ -201,4 +195,4 @@ class Complex {
 
 **<실행화면>**
 
-![image-20200517233136226](image-20200517233136226.png) 
+![image-20200517233136226](https://user-images.githubusercontent.com/62750326/82152945-94175300-989f-11ea-8a78-5fb2eba1fb91.PNG) 
