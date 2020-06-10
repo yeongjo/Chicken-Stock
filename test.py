@@ -7,9 +7,23 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import QIcon, QPixmap
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+
+
+#텔레그램
 import telepot
+
+# 한강물
 from urllib.request import urlopen
+
+# 프로그램간의 데이터 공유
 import IPC
+
+#메일보내기
+import smtplib
+from email.mime.text import MIMEText
+
+
+
 
 # 읽어온 현재가격 리스트
 price = []
@@ -78,6 +92,16 @@ if __name__ == '__main__':
     #a = a.split('","')[1].split('":"')[1]
     #print(a)
 
+    ## 메일
+    #s = smtplib.SMTP('smtp.gmail.com', 587)
+    #s.starttls()
+    #s.login('songchung2466@gmail.com', 'cxthezwhgvlzxzgh')
+    #msg = MIMEText('내용 : 본문내용 테스트입니다.')
+    #msg['Subject'] = '제목 : 메일 보내기 테스트입니다.'
+    ## 메일 보내기
+    #s.sendmail("songchung2466@gmail.com", "songchung2466@gmail.com", msg.as_string())
+    ## 세션 종료
+    #s.quit()
 
     #IPC 받기
     IPC.StartReceiving(getData)
