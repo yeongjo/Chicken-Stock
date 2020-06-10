@@ -7,7 +7,12 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import QIcon, QPixmap
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+import telepot
+from urllib.request import urlopen
+import IPC
 
+# 읽어온 현재가격 리스트
+price = []
 
 def Map():
     # 위도 경도 지정
@@ -53,9 +58,30 @@ class MyWindow(QWidget):
         ax.plot(test2)
         self.canvas.draw()
 
+def getData(v):
+    global price
+    print("받아온 데이터지롱: ", v)
+
+    # 테스트할땐 이거 끄고 써야함 매번 똑같은거 보내기 때ㅜㅁㄴ이지
+    #price.append(v)
 
 if __name__ == '__main__':
     import sys
+
+    ## 텔레그램
+    #bot = telepot.Bot("1181238589:AAGEQZaoVhU6YHvd67nIpkKQcXoJKP2syfU")
+    #bot.sendMessage('1132616128','hi') # 메세지 보내기, 나한테 hi 옴
+
+    ## 한강물온도
+    #html = urlopen("http://hangang.dkserver.wo.tc/")  
+    #a = html.read().decode('utf-8')
+    #a = a.split('","')[1].split('":"')[1]
+    #print(a)
+
+
+    #IPC 받기
+    IPC.StartReceiving(getData)
+
     app = QtWidgets.QApplication(sys.argv)
     window = MyWindow()
     window.show()

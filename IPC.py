@@ -25,7 +25,7 @@ class ReceiveThread (threading.Thread):
                 #Read pipe file
                 pipe = open(ReadPath, 'r+b')
                 buffer = pipe.readlines()
-                pipe.truncate(0)
+                #pipe.truncate(0)
                 pipe.close()
 
                 #Iterate and call callback function
