@@ -6,6 +6,10 @@ from PyQt5.QtCore import *
 import csv
 import IPC
 import time
+import smtplib
+from email.mime.text import MIMEText
+
+
 
 ReadPath='pipe\\pipe'
 
@@ -20,25 +24,30 @@ class KiwoomAPI:
 
     def reqTR(self):
         self.totalDataCnt = 0
-        self.sPreNext = 0
+        self.sPreNext = '0'
         with open('test.csv','w', newline='') as csvfile:
             self.spamwriter = csv.writer(csvfile)
             self.spamwriter.writerow(["시가", "거래량", "20개평균"])
-            while True:
-                #opt10001
-                if len(self.code) == 0:
-                    self.code = "005930"
-                self.OCXconn.dynamicCall("SetInputValue(QString, QString)", "종목코드", self.code)
-                #self.OCXconn.dynamicCall("CommRqData(QString, QString, QString, QString)", "AT_opt10001", "opt10001", "0", "0101") # 이름출력
 
+            #opt10001
+            if len(self.code) == 0:
+                self.code = "005930"
+
+            while True:
+                isContinue = "0"
+                if self.sPreNext == '2':
+                    isContinue = "2"
+
+                self.OCXconn.dynamicCall("SetInputValue(QString, QString)", "종목코드", self.code)
                 self.OCXconn.dynamicCall("SetInputValue(QString, QString)", "틱범위", "1:1분")
                 self.OCXconn.dynamicCall("SetInputValue(QString, QString)", "수정주가구분", "1")
-                self.OCXconn.dynamicCall("CommRqData(QString, QString, QString, QString)", "주식분봉차트조회요청", "OPT10080", "0", "1000")
+                self.OCXconn.dynamicCall("CommRqData(QString, QString, QString, QString)", "주식분봉차트조회요청", "opt10080", isContinue, "1000")
+                
                 self.tr_event_loop = QEventLoop()
                 self.tr_event_loop.exec_()
                 time.sleep(0.22)
                 print("요청결과: ",self.sPreNext)
-                if self.sPreNext == 0 or self.totalDataCnt >= self.loadCount:
+                if self.sPreNext == '0' or self.totalDataCnt >= self.loadCount:
                     break
                 print("현재 불러온 데이터 수",self.totalDataCnt)
         print("총 불러온 데이터 수",self.totalDataCnt)
