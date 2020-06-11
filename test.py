@@ -72,6 +72,10 @@ class MyWindow(QWidget):
         ax.plot(test2)
         self.canvas.draw()
 
+    def sendName(self):
+        IPC.WritePath = "pipe\\name"
+        IPC.Send("005930") # 종목코드로 보내기
+
 def getData(v):
     global price
     print("받아온 데이터지롱: ", v)

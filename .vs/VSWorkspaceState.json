@@ -1,7 +1,8 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\pipe"
   ],
-  "SelectedNode": "\\main.py",
+  "SelectedNode": "\\test.csv",
   "PreviewInSolutionExplorer": false
 }

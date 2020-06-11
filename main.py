@@ -20,6 +20,10 @@ class KiwoomAPI:
         self.OCXconn.OnEventConnect.connect(self.connEvent)
         self.OCXconn.OnReceiveTrData.connect(self.trEvent)
         self.OCXconn.OnReceiveRealData.connect(self.getRealTimeData)
+        IPC.ReadPath = "pipe\\name"
+        IPC.StartReceiving(self.getData)
+
+
 
     def reqTR(self):
         self.totalDataCnt = 0
@@ -63,19 +67,19 @@ class KiwoomAPI:
             print('로그인 성공')
 
             while True:
-                test.code = input("종목코드 입력하세요 숫자로 된거 아무것도 입력안하면 삼성꺼로함")
+                self.code = input("종목코드 입력하세요 숫자로 된거 아무것도 입력안하면 삼성꺼로함")
                 self.saveType = input("w: csv 가져오기, e: pipe 보내기 시작")
                 # csv 가져옴
                 if self.saveType == 'w':
                     print("csv 저장 수행")
-                    test.loadCount = int(input("몇분치 불러올거? (int)"))
-                    test.reqTR()
+                    self.loadCount = int(input("몇분치 불러올거? (int)"))
+                    self.reqTR()
                 if self.saveType == 'e':
                     print("pipe 보내기 기능 수행")
-                    test.loadCount = 30
+                    self.loadCount = 30
                     # 첫시작을 비우고 새로 불러오는거로 시작
                     open(ReadPath, 'r+b').truncate(0)
-                    test.reqTR()
+                    self.reqTR()
         else:
             print('로그인 실패')
 
@@ -95,9 +99,9 @@ class KiwoomAPI:
             averageList = []
             average = 0
             sendData = []
+            if self.loadCount < self.totalDataCnt + dataCnt:
+                dataCnt = self.loadCount - self.totalDataCnt
             self.totalDataCnt += dataCnt
-            if self.loadCount < self.totalDataCnt:
-                dataCnt = self.loadCount - (self.totalDataCnt - dataCnt)
 
             for i in range(dataCnt):
                 date = self.OCXconn.dynamicCall("GetCommData(QString, QString, int, QString)", sTrCode, sRQName, i, "체결시간").strip()
@@ -130,9 +134,18 @@ class KiwoomAPI:
             pass
                 
 
+test = None
 
+ def getData(self):
+    global test
+    test.print("검색요청으로 pipe 보내기 기능 수행")
+    test.loadCount = 30
+    # 첫시작을 비우고 새로 불러오는거로 시작
+    open(ReadPath, 'r+b').truncate(0)
+    test.reqTR()
                                
 if __name__ == "__main__":
+    global test
     app = QApplication(sys.argv)
     test = KiwoomAPI()
     test.login()
