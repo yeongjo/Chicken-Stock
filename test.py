@@ -22,6 +22,9 @@ import IPC
 import smtplib
 from email.mime.text import MIMEText
 
+# 종목코드 얻어오기
+#import stockDB
+
 
 
 
