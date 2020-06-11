@@ -1,4 +1,4 @@
-# -*- coding:utf-8 -*-
+
 import matplotlib.pyplot as plt
 import folium
 import webbrowser
@@ -21,6 +21,12 @@ import IPC
 # 메일보내기
 import smtplib
 from email.mime.text import MIMEText
+
+# 종목코드 얻어오기
+#import stockDB
+
+
+
 
 # 읽어온 현재가격 리스트
 price = []
@@ -118,6 +124,9 @@ class MyWindow(QWidget):
         ax.legend()
         self.canvas.draw()
 
+    def sendName(self):
+        IPC.WritePath = "pipe\\name"
+        IPC.Send("005930") # 종목코드로 보내기
 
 def getData(v):
     global price
