@@ -86,6 +86,8 @@ def getData(v):
     # 테스트할땐 이거 끄고 써야함 매번 똑같은거 보내기 때ㅜㅁㄴ이지
     #price.append(v)
 
+
+
 if __name__ == '__main__':
     import sys
 
