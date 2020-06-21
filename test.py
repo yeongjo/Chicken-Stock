@@ -30,6 +30,8 @@ import stockDB
 
 from keras.models import load_model
 
+import spam
+
 # 읽어온 현재가격 리스트
 price = []
 
@@ -173,7 +175,7 @@ class MyWindow(QWidget):
             predictions = model.predict(np.array([predictPrice[:15]]))
             result = minDaTa+(maxData-minDaTa)*predictions
             predictPrice = np.append(np.array([[int(result),predictPrice[0,1],0]]), predictPrice, axis=0)
-            dota2 = sum(predictPrice[:20,2])/20
+            dota2 = spam.division(sum(predictPrice[:20,2]),20)
             predictPrice[0,2] = dota2
         ax.plot(np.flip(predictPrice[:,0]),'r', label=self.stockList.currentItem().text())
 
