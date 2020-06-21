@@ -1,55 +1,16 @@
 import pandas as pd
-import pandas_datareader as pdr
 
-# Á¾¸ñ Å¸ÀÔ¿¡ µû¶ó download urlÀÌ ´Ù¸§. Á¾¸ñÄÚµå µÚ¿¡ .KS .KQµîÀÌ ÀÔ·ÂµÇ¾î¾ßÇØ¼­ Download Link ±¸ºĞ ÇÊ¿ä
-stock_type = {
-	'kospi': 'stockMkt',
-	'kosdaq': 'kosdaqMkt'
-}
+dfstockcode = pd.read_html('http://kind.krx.co.kr/corpgeneral/corpList.do?method=download', header=0)[0]
 
-# È¸»ç¸íÀ¸·Î ÁÖ½Ä Á¾¸ñ ÄÚµå¸¦ È¹µæÇÒ ¼ö ÀÖµµ·Ï ÇÏ´Â ÇÔ¼ö
-def get_code(df, name):
-	code = df.query("name=='{}'".format(name))['code'].to_string(index=False)
-	# À§¿Í°°ÀÌ code¸íÀ» °¡Á®¿À¸é ¾Õ¿¡ °ø¹éÀÌ ºÙ¾îÀÖ´Â »óÈ²ÀÌ ¹ß»ıÇÏ¿© ¾ÕµÚ·Î sript() ÇÏ¿© °ø¹é Á¦°Å
-	code = code.strip()
-	return code
+# ì¢…ëª©ì½”ë“œì— ê°’ì„ 6ìë¦¬ ë¬¸ìì—´ë¡œ ì„¤ì • 
+#    ì¢…ëª©ì½”ë“œì˜ ìˆ«ìê°’ì„ 6ìë¦¬ ë¬¸ìì—´ë¡œ ë³€í™˜
+#    ì±„ìš°ëŠ” ìë¦¬ëŠ” 0ìœ¼ë¡œ ì±„ìš°ê¸°
+dfstockcode.ì¢…ëª©ì½”ë“œ = dfstockcode.ì¢…ëª©ì½”ë“œ.map('{:06d}'.format)
 
-# download url Á¶ÇÕ
-def get_download_stock(market_type=None):
-	market_type = stock_type[market_type]
-	download_link = 'http://kind.krx.co.kr/corpgeneral/corpList.do'
-	download_link = download_link + '?method=download'
-	download_link = download_link + '&marketType=' + market_type
-	df = pd.read_html(download_link, header=0)[0]
-	return df;
+# í•„ìš”í•œ ì»¬ëŸ¼ë§Œìœ¼ë¡œ DataFrameì„ ì„¤ì •
+dfstockcode = dfstockcode[['íšŒì‚¬ëª…', 'ì¢…ëª©ì½”ë“œ']]
 
-# kospi Á¾¸ñÄÚµå ¸ñ·Ï ´Ù¿î·Îµå
-def get_download_kospi():
-	df = get_download_stock('kospi')
-	df.Á¾¸ñÄÚµå = df.Á¾¸ñÄÚµå.map('{:06d}.KS'.format)
-	return df
+# ì»¬ëŸ¼ëª…ì„ í•œê¸€ì—ì„œ ì˜ì–´ë¡œ ë³€ê²½ 
+dfstockcode = dfstockcode.rename(columns={'íšŒì‚¬ëª…':'name', 'ì¢…ëª©ì½”ë“œ':'code'})
 
-# kosdaq Á¾¸ñÄÚµå ¸ñ·Ï ´Ù¿î·Îµå
-def get_download_kosdaq():
-	df = get_download_stock('kosdaq')
-	df.Á¾¸ñÄÚµå = df.Á¾¸ñÄÚµå.map('{:06d}.KQ'.format)
-	return df
-
-# kospi, kosdaq Á¾¸ñÄÚµå °¢°¢ ´Ù¿î·Îµå
-kospi_df = get_download_kospi()
-kosdaq_df = get_download_kosdaq()
-
-# data frame merge
-code_df = pd.concat([kospi_df, kosdaq_df])
-
-# data frameÁ¤¸®
-code_df = code_df[['È¸»ç¸í', 'Á¾¸ñÄÚµå']]
-
-# data frame title º¯°æ 'È¸»ç¸í' = name, Á¾¸ñÄÚµå = 'code'
-code_df = code_df.rename(columns={'È¸»ç¸í': 'name', 'Á¾¸ñÄÚµå': 'code'})
-
-# »ï¼ºÀüÀÚÀÇ Á¾¸ñÄÚµå È¹µæ. data frame¿¡´Â ÀÌ¹Ì XXXXXX.KX ÇüÅÂ·Î Á¶ÇÕÀÌ µÇ¾îÀÖÀ½
-code = get_code(code_df, '»ï¼ºÀüÀÚ')
-
-# get_data_yahoo API¸¦ ÅëÇØ¼­ yahho financeÀÇ ÁÖ½Ä Á¾¸ñ µ¥ÀÌÅÍ¸¦ °¡Á®¿Â´Ù.
-df = pdr.get_data_yahoo(code)
+dfstockcode.set_index('name', inplace=True)

@@ -26,7 +26,7 @@ from email.mime.text import MIMEText
 import numpy as np
 
 # 종목코드 얻어오기
-# import stockDB
+import stockDB
 
 from keras.models import load_model
 
@@ -149,6 +149,7 @@ class MyWindow(QWidget):
     def getStockName(self):
         # 주식 이름 있어여하는 조건 넣어야함
         if not self.stockName.text() == '':
+            print(stockDB.dfstockcode.loc[self.stockName.text()][0])
             self.stockList.addItem(self.stockName.text())
         else:
             msgbox = QMessageBox()
@@ -158,8 +159,8 @@ class MyWindow(QWidget):
     def stock_graph(self):
         time.sleep(0.30)
         self.fig.clear()
-        ax = self.fig.add_subplot(2, 1, 1)
-        ax2 = self.fig.add_subplot(2, 1, 2)
+        ax = self.fig.add_subplot(1, 1, 1)
+        #ax2 = self.fig.add_subplot(2, 1, 2)
 
         global model, price
         
@@ -169,23 +170,27 @@ class MyWindow(QWidget):
         for i in range(5):
             minDaTa = min(predictPrice[:15,0])
             maxData = max(predictPrice[:15,0])
-            print("t: ",np.array([predictPrice[:15]]))
             predictions = model.predict(np.array([predictPrice[:15]]))
             result = minDaTa+(maxData-minDaTa)*predictions
-            predictPrice = np.append(np.array([[int(result),0,0]]), predictPrice, axis=0)
-            print("end: ", predictPrice)
-        ax.plot(predictPrice[:,0], label=self.stockList.currentItem().text())
-        ax2.plot(price[:,0], label=self.stockList.currentItem().text())
+            predictPrice = np.append(np.array([[int(result),predictPrice[0,1],0]]), predictPrice, axis=0)
+            dota2 = sum(predictPrice[:20,2])/20
+            predictPrice[0,2] = dota2
+        ax.plot(np.flip(predictPrice[:,0]),'r', label=self.stockList.currentItem().text())
+
+
+        price = price[:,0]
+        #np.append(
+        ax.plot(np.flip(price), 'k', label="one")
 
         ax.set_xlabel("분")
         ax.set_ylabel("\\")
         ax.set_title(self.stockList.currentItem().text())
-        ax.legend()
+        ax.legend(loc="best")
         self.canvas.draw()
 
     def sendName(self, text):
         IPC.WritePath = "pipe\\name"
-        #IPC.Send(text)  # 종목코드로 보내기
+        IPC.Send(stockDB.dfstockcode.loc[self.stockName.text()][0])  # 종목코드로 보내기
         # 005930
 
 do_once = False
