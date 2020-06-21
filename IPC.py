@@ -23,16 +23,20 @@ class ReceiveThread (threading.Thread):
         while (True):
             try:
                 #Read pipe file
-                pipe = open(ReadPath, 'r+b')
-                buffer = pipe.readlines()
+                pipe = open(ReadPath, 'rb')
+                while True:
+                    data = pickle.load(pipe)
+                    self.recv_callback(data)
+                return
+                #buffer = pipe.readlines()
                 #pipe.truncate(0)
-                pipe.close()
+                #pipe.close()
 
                 #Iterate and call callback function
                 bCount = len(buffer)
                 idx=0
                 while (idx < bCount):
-                    received = pickle.loads(buffer[idx])
+                    received = pickle.load(buffer[idx])
                     self.recv_callback(received)
                     idx+=1
 
@@ -47,30 +51,24 @@ class ReceiveThread (threading.Thread):
                 time.sleep(0.1)
                 continue
 
-            except:
-                print('Unknown is occurred in ipc thread. You`re totally fucked up')
-                break;
+            #except:
+            #    print('Unknown is occurred in ipc thread. You`re totally fucked up')
+            #    break
 
             time.sleep(0.1)
 
         print('Receive thread is stopped')
-        return
 
 def StartReceiving (callback=None):
     t = ReceiveThread()
     t.recv_callback = callback
     t.start()
-    return
 
 def Send(data):
-
-    p = pickle.dumps(data)
-    pipe = open(WritePath, 'ab')
-    p += bytes(os.linesep.encode('utf-8'))
-    pipe.write(p)
-    pipe.close()
-
-    return;
+    with open(WritePath, 'wb') as pipe:
+        p = pickle.dump(data, pipe)
+        #p += bytes(os.linesep.encode('utf-8'))
+        #pipe.write(p)
 
 
 #[아키네이터] [2:35] Send는 전송

@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 # from PyQt5.uic.properties import QtCore
 import time
+import copy
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 # 텔레그램
@@ -22,9 +23,12 @@ import IPC
 import smtplib
 from email.mime.text import MIMEText
 
+import numpy as np
+
 # 종목코드 얻어오기
 # import stockDB
 
+from keras.models import load_model
 
 # 읽어온 현재가격 리스트
 price = []
@@ -154,8 +158,25 @@ class MyWindow(QWidget):
     def stock_graph(self):
         time.sleep(0.30)
         self.fig.clear()
-        ax = self.fig.add_subplot(1, 1, 1)
-        ax.plot(price, label=self.stockList.currentItem().text())
+        ax = self.fig.add_subplot(2, 1, 1)
+        ax2 = self.fig.add_subplot(2, 1, 2)
+
+        global model, price
+        
+        #price = np.flip(price)
+        predictPrice = copy.deepcopy(np.array(price))
+        
+        for i in range(5):
+            minDaTa = min(predictPrice[:15,0])
+            maxData = max(predictPrice[:15,0])
+            print("t: ",np.array([predictPrice[:15]]))
+            predictions = model.predict(np.array([predictPrice[:15]]))
+            result = minDaTa+(maxData-minDaTa)*predictions
+            predictPrice = np.append(np.array([[int(result),0,0]]), predictPrice, axis=0)
+            print("end: ", predictPrice)
+        ax.plot(predictPrice[:,0], label=self.stockList.currentItem().text())
+        ax2.plot(price[:,0], label=self.stockList.currentItem().text())
+
         ax.set_xlabel("분")
         ax.set_ylabel("\\")
         ax.set_title(self.stockList.currentItem().text())
@@ -164,17 +185,19 @@ class MyWindow(QWidget):
 
     def sendName(self, text):
         IPC.WritePath = "pipe\\name"
-        IPC.Send(text)  # 종목코드로 보내기
+        #IPC.Send(text)  # 종목코드로 보내기
         # 005930
 
-
+do_once = False
 def getData(v):
-    global price
-    # print("받아온 데이터지롱: ", v)
-    price = v
+    global price, model, do_once, predictData
+    if do_once:
+        return
+    price = np.array(v)
+    print("받아온 데이터지롱: ", price)
     # 테스트할땐 이거 끄고 써야함 매번 똑같은거 보내기 때ㅜㅁㄴ이지
     # price.append(v)
-
+    do_once = True
 
 def sendTelegram():
     bot = telepot.Bot("1181238589:AAGEQZaoVhU6YHvd67nIpkKQcXoJKP2syfU")
@@ -208,9 +231,11 @@ def sendGmail():
 
 
 if __name__ == '__main__':
+    global model
     import sys
     getHanRiverTemp()
 
+    model = load_model('model.h5')
 
     # IPC 받기
     IPC.StartReceiving(getData)

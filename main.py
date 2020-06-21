@@ -20,7 +20,7 @@ class KiwoomAPI:
         # Event Listener
         self.OCXconn.OnEventConnect.connect(self.connEvent)
         self.OCXconn.OnReceiveTrData.connect(self.trEvent)
-        self.OCXconn.OnReceiveRealData.connect(self.getRealTimeData)
+        #self.OCXconn.OnReceiveRealData.connect(self.getRealTimeData)
         self.saveType = 'e'
 
     def reqTR(self):
@@ -64,23 +64,25 @@ class KiwoomAPI:
         if nErrCode == 0:
             print('로그인 성공')
 
-            IPC.ReadPath = "pipe\\name"
-            IPC.StartReceiving(getData)
-
-            # while True:
-            #     self.code = input("종목코드 입력하세요 숫자로 된거 아무것도 입력안하면 삼성꺼로함")
-            #     self.saveType = input("w: csv 가져오기, e: pipe 보내기 시작")
-            #     # csv 가져옴
-            #     if self.saveType == 'w':
-            #         print("csv 저장 수행")
-            #         self.loadCount = int(input("몇분치 불러올거? (int)"))
-            #         self.reqTR()
-            #     if self.saveType == 'e':
-            #         print("pipe 보내기 기능 수행")
-            #         self.loadCount = 30
-            #         # 첫시작을 비우고 새로 불러오는거로 시작
-            #         open(ReadPath, 'r+b').truncate(0)
-            #         self.reqTR()
+            mode = input("읽기모드(1), 쓰기모드(다른거)")
+            if mode == 1:
+                IPC.ReadPath = "pipe\\name"
+                IPC.StartReceiving(getData)
+            else:
+                while True:
+                    self.code = input("종목코드 입력하세요 숫자로 된거 아무것도 입력안하면 삼성꺼로함")
+                    self.saveType = input("w: csv 가져오기, e: pipe 보내기 시작")
+                    # csv 가져옴
+                    if self.saveType == 'w':
+                        print("csv 저장 수행")
+                        self.loadCount = int(input("몇분치 불러올거? (int)"))
+                        self.reqTR()
+                    if self.saveType == 'e':
+                        print("pipe 보내기 기능 수행")
+                        self.loadCount = 30
+                        # 첫시작을 비우고 새로 불러오는거로 시작
+                        open(ReadPath, 'r+b').truncate(0)
+                        self.reqTR()
         else:
             print('로그인 실패')
 
@@ -121,7 +123,7 @@ class KiwoomAPI:
                 average = int(average)
 
                 if self.saveType == 'e':
-                    sendData.append(start)
+                    sendData.append([start, int(mount), average])
 
                 if self.saveType == 'w':
                     self.spamwriter.writerow([start, mount, average])
