@@ -141,12 +141,12 @@ class MyWindow(QWidget):
     def clickedList(self):
         print(self.stockList.currentItem().text())
         self.sendName(self.stockList.currentItem().text())
-        self.stock_graph()
+        self.stock_graph(self.stockList.currentItem().text())
 
     # 관심종목 리스트 클릭되면
     def clickedFavoriteList(self):
         self.sendName(self.favoriteList.currentItem().text())
-        self.stock_graph()
+        self.stock_graph(self.favoriteList.currentItem().text())
 
     def getStockName(self):
         # 주식 이름 있어여하는 조건 넣어야함
@@ -158,17 +158,19 @@ class MyWindow(QWidget):
             msgbox.setText('입력한 주식정보가 없습니다.')
             msgbox.exec_()
 
-    def stock_graph(self):
+    def stock_graph(self, lal):
         time.sleep(0.30)
         self.fig.clear()
         ax = self.fig.add_subplot(1, 1, 1)
         #ax2 = self.fig.add_subplot(2, 1, 2)
 
-        global model, price
+        global model, price, gotStockName 
         
         #price = np.flip(price)
         predictPrice = copy.deepcopy(np.array(price))
         
+        print(predictPrice)
+
         for i in range(5):
             minDaTa = min(predictPrice[:15,0])
             maxData = max(predictPrice[:15,0])
@@ -177,38 +179,42 @@ class MyWindow(QWidget):
             predictPrice = np.append(np.array([[int(result),predictPrice[0,1],0]]), predictPrice, axis=0)
             dota2 = spam.division(sum(predictPrice[:20,2]),20)
             predictPrice[0,2] = dota2
-        ax.plot(np.flip(predictPrice[:,0]),'r', label=self.stockList.currentItem().text())
+        ax.plot(np.flip(predictPrice[:,0]),'r', label="예측")
 
 
         price = price[:,0]
         #np.append(
-        ax.plot(np.flip(price), 'k', label="one")
+        ax.plot(np.flip(price), 'k', label=lal)
+        gotStockName = lal
 
         ax.set_xlabel("분")
         ax.set_ylabel("\\")
-        ax.set_title(self.stockList.currentItem().text())
+        ax.set_title(lal)
         ax.legend(loc="best")
         self.canvas.draw()
 
     def sendName(self, text):
         IPC.WritePath = "pipe\\name"
-        IPC.Send(stockDB.dfstockcode.loc[self.stockName.text()][0])  # 종목코드로 보내기
+        IPC.Send(stockDB.dfstockcode.loc[text][0])  # 종목코드로 보내기
         # 005930
 
 do_once = False
+price = np.array([])
 def getData(v):
     global price, model, do_once, predictData
-    if do_once:
-        return
-    price = np.array(v)
-    print("받아온 데이터지롱: ", price)
-    # 테스트할땐 이거 끄고 써야함 매번 똑같은거 보내기 때ㅜㅁㄴ이지
-    # price.append(v)
-    do_once = True
+    t = np.array(v)
+
+    if not do_once:
+        do_once = True
+        print("받아온 데이터지롱: ", price)
+    elif not np.array_equal(t,price):
+        do_once = False
+    price = t
 
 def sendTelegram():
+    global gotStockName
     bot = telepot.Bot("1181238589:AAGEQZaoVhU6YHvd67nIpkKQcXoJKP2syfU")
-    bot.sendMessage('1132616128', str("마지막 가격은 " + str(price[-1]) + "원 입니다."))  # 메세지 보내기
+    bot.sendMessage('1132616128', str(gotStockName +"의 5분 뒤 마지막 가격은 " + str(price[-1][0]) + "원 입니다."))  # 메세지 보내기
 
 
 Htemp = 0
@@ -223,11 +229,12 @@ def getHanRiverTemp():
 
 
 def sendGmail():
+    global gotStockName
     # 메일
     s = smtplib.SMTP('smtp.gmail.com', 587)
     s.starttls()
     s.login('songchung2466@gmail.com', 'cxthezwhgvlzxzgh')
-    msg = MIMEText(str("마지막 가격은 " + str(price[-1]) + "원 입니다."))
+    msg = MIMEText(str(gotStockName +"의 5분 뒤 가격은 " + str(price[-1][0]) + "원 입니다."))
     msg['Subject'] = '제목 : 주식예측봇이 전해드립니다.'
     # 메일 보내기
     s.sendmail("songchung2466@gmail.com", "songchung2466@gmail.com", msg.as_string())

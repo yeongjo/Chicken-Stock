@@ -65,7 +65,7 @@ class KiwoomAPI:
             print('로그인 성공')
 
             mode = input("읽기모드(1), 쓰기모드(다른거)")
-            if mode == 1:
+            if mode == '1':
                 IPC.ReadPath = "pipe\\name"
                 IPC.StartReceiving(getData)
             else:
@@ -155,13 +155,8 @@ def getData(data):
 if __name__ == "__main__":
     global test
 
-
-
     app = QApplication(sys.argv)
     test = KiwoomAPI()
-
-    # IPC.WritePath = "pipe\\name"
-    # IPC.Send("123722")  # 종목코드로 보내기
 
     test.login()
     app.exec_()
